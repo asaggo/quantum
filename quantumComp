@@ -1,0 +1,620 @@
+---
+title: "quantumComp"
+author: "Jessie Ji, Jay Oh, James Kim"
+date: "7/25/2017"
+output: html_document
+
+params:
+  company: 1
+  team: 0
+---
+
+
+```{r, include=FALSE}
+library(DT)
+library(readr)
+library(pander)
+
+quantumComp <- read.csv("~/Desktop/Course/survey/surveyTest1/data.csv", header=TRUE)[-c(1,2),]
+```
+
+```{r, include=FALSE}
+#Q1.12 (company, team)
+quantumComp$Q1.1.A <- as.numeric(as.character(quantumComp$Q1.1.A))
+quantumComp$Q1.1.B <- as.numeric(as.character(quantumComp$Q1.1.B))
+
+q1_12CompSum <- 0
+q1_12CompNum <- 0
+q1_12TeamSum <- 0
+q1_12TeamNum <- 0
+q1_12TeamAverage <- 0
+q1_12CompAverage <- 0
+
+
+for(index in 1:nrow(quantumComp)) {
+  #If user choose a company and it matches with the person in the quantumComp
+  if(!is.na(quantumComp[index,22])){
+    if(quantumComp[index,22] == params$company) {
+      #If user choose a company and a team, and it matches with the person in the quantumComp
+      if((params$team > 0) & (params$team == quantumComp[index,23])){
+        q1_12TeamNum <- q1_12TeamNum + 1
+        q1_12TeamSum <- q1_12TeamSum + as.numeric(as.character((quantumComp[index,35])))
+      } #else, we do nothing here
+      
+      #processing to compute the company's average
+      q1_12CompNum <- q1_12CompNum + 1
+      q1_12CompSum <- q1_12CompSum + as.numeric(as.character(quantumComp[index,35]))
+    }
+  }
+}
+
+q1_12CompAverage <- q1_12CompSum / q1_12CompNum
+q1_12TeamAverage <- q1_12TeamSum / q1_12TeamNum
+```
+
+```{r, include=FALSE}
+#Q1.12 (global)
+q1_12GlobalAve <- round(mean(na.omit(as.numeric(as.character(quantumComp$Q1.12)))),2)
+```
+
+
+```{r, include=FALSE}
+#Q1.13 (company, team)
+
+q1_13CompSum <- 0
+q1_13CompNum <- 0
+q1_13TeamSum <- 0
+q1_13TeamNum <- 0
+q1_13TeamAverage <- 0
+q1_13CompAverage <- 0
+
+
+for(index in 1:nrow(quantumComp)) {
+  #If user choose a company and it matches with the person in the quantumComp
+  if(!is.na(quantumComp[index,22])){
+    if(quantumComp[index,22] == params$company) {
+      #If user choose a company and a team, and it matches with the person in the quantumComp
+      if((params$team > 0) & (params$team == quantumComp[index,23])){
+        q1_13TeamNum <- q1_13TeamNum + 1
+        q1_13TeamSum <- q1_13TeamSum + as.numeric(as.character((quantumComp[index,36])))
+      } #else, we do nothing here
+      
+      #processing to compute the company's average
+      q1_13CompNum <- q1_13CompNum + 1
+      q1_13CompSum <- q1_13CompSum + as.numeric(as.character(quantumComp[index,36]))
+    }
+  }
+}
+
+q1_13CompAverage <- q1_13CompSum / q1_13CompNum
+q1_13TeamAverage <- q1_13TeamSum / q1_13TeamNum
+```
+
+```{r, include=FALSE}
+#Q1.13 (global)
+q1_13GlobalAve <- round(mean(na.omit(as.numeric(as.character(quantumComp$Q1.13)))),2)
+```
+
+```{r, include=FALSE}
+#Q1.15 (company, team)
+
+q1_15CompSum <- 0
+q1_15CompNum <- 0
+q1_15TeamSum <- 0
+q1_15TeamNum <- 0
+q1_15TeamAverage <- 0
+q1_15CompAverage <- 0
+
+
+for(index in 1:nrow(quantumComp)) {
+  #If user choose a company and it matches with the person in the quantumComp
+  if(!is.na(quantumComp[index,22])){
+    if(quantumComp[index,22] == params$company) {
+      #If user choose a company and a team, and it matches with the person in the quantumComp
+      if((params$team > 0) & (params$team == quantumComp[index,23])){
+        q1_15TeamNum <- q1_15TeamNum + 1
+        q1_15TeamSum <- q1_15TeamSum + as.numeric(as.character((quantumComp[index,38])))
+      } #else, we do nothing here
+      
+      #processing to compute the company's average
+      q1_15CompNum <- q1_15CompNum + 1
+      q1_15CompSum <- q1_15CompSum + as.numeric(as.character(quantumComp[index,38]))
+    }
+  }
+}
+
+q1_15CompAverage <- q1_15CompSum / q1_15CompNum
+q1_15TeamAverage <- q1_15TeamSum / q1_15TeamNum
+```
+
+```{r, include=FALSE}
+#Q1.15 (global)
+q1_15GlobalAve <- round(mean(na.omit(as.numeric(as.character(quantumComp$Q1.15)))),2)
+```
+
+
+```{r, include=FALSE}
+# Q1.12 Color display
+alpha <- 0.05
+
+# subsetting specific data frame
+compData <- subset(quantumComp, Q1.1.A==params$company)
+teamData <- subset(compData, Q1.1.B==params$team)
+
+# independent sample t test
+# For company
+if(params$team <= 0){
+  result <- t.test(na.omit(as.numeric(as.character(compData$Q1.12))), na.omit(as.numeric(as.character(quantumComp$Q1.12))), mu = 0, alternative = "two.sided", conf.level = 0.95)
+q1_12positive <- ((q1_12CompAverage - q1_12GlobalAve) > 0)
+} else if(params$team > 0){ 
+  # for Team
+ result <- t.test(na.omit(as.numeric(as.character(teamData$Q1.12))), na.omit(as.numeric(as.character(quantumComp$Q1.12))), mu = 0, alternative = "two.sided", conf.level = 0.95)
+q1_12positive <- ((q1_12TeamAverage - q1_12GlobalAve) > 0)
+}
+
+# check the significance of the result
+q1_12significance <- result$p.value < alpha
+
+# display color from the result
+if(q1_12significance & q1_12positive) {
+  q1_12answer <- "green"
+} else if (q1_12significance & !q1_12positive) {
+  q1_12answer <- "red"
+} else if(!q1_12significance){
+  q1_12answer <- "orange"
+}
+```
+
+
+```{r, include=FALSE}
+# Q1.13 Color display
+
+# independent sample t test
+# For company
+if(params$team <= 0){
+  result <- t.test(na.omit(as.numeric(as.character(compData$Q1.13))), na.omit(as.numeric(as.character(quantumComp$Q1.13))), mu = 0, alternative = "two.sided", conf.level = 0.95)
+q1_13positive <- ((q1_13CompAverage - q1_13GlobalAve) > 0)
+} else if(params$team > 0){ 
+  # for Team
+ result <- t.test(na.omit(as.numeric(as.character(teamData$Q1.13))), na.omit(as.numeric(as.character(quantumComp$Q1.13))), mu = 0, alternative = "two.sided", conf.level = 0.95)
+q1_13positive <- ((q1_13TeamAverage - q1_13GlobalAve) > 0)
+}
+
+# check the significance of the result
+q1_13significance <- result$p.value < alpha
+
+# display color from the result
+if(q1_13significance & q1_13positive) {
+  q1_13answer <- "green"
+} else if (q1_13significance & !q1_13positive) {
+  q1_13answer <- "red"
+} else if(!q1_13significance){
+  q1_13answer <- "orange"
+}
+```
+
+```{r, include=FALSE}
+# Q1.15 Color display
+
+# independent sample t test
+# For company
+if(params$team <= 0){
+  result <- t.test(na.omit(as.numeric(as.character(compData$Q1.15))), na.omit(as.numeric(as.character(quantumComp$Q1.15))), mu = 0, alternative = "two.sided", conf.level = 0.95)
+q1_15positive <- ((q1_15CompAverage - q1_15GlobalAve) > 0)
+} else if(params$team > 0){ 
+  # for Team
+ result <- t.test(na.omit(as.numeric(as.character(teamData$Q1.15))), na.omit(as.numeric(as.character(quantumComp$Q1.15))), mu = 0, alternative = "two.sided", conf.level = 0.95)
+q1_15positive <- ((q1_15TeamAverage - q1_15GlobalAve) > 0)
+}
+
+# check the significance of the result
+q1_15significance <- result$p.value < alpha
+
+# display color from the result
+if(q1_15significance & q1_15positive) {
+  q1_15answer <- "green"
+} else if (q1_15significance & !q1_15positive) {
+  q1_15answer <- "red"
+} else if(!q1_15significance){
+  a1_15answer <- "orange"
+}
+
+```
+
+```{r, include=FALSE}
+q1_12CompAverage <- round(q1_12CompAverage, 2)
+q1_13CompAverage <- round(q1_13CompAverage, 2)
+q1_15CompAverage <- round(q1_15CompAverage, 2)
+
+q1_12TeamAverage <- round(q1_12TeamAverage, 2)
+q1_13TeamAverage <- round(q1_13TeamAverage, 2)
+q1_15TeamAverage <- round(q1_15TeamAverage, 2)
+
+q1_12GlobalAve <- round(q1_12GlobalAve, 2)
+q1_13GlobalAve <- round(q1_13GlobalAve, 2)
+q1_15GlobalAve <- round(q1_15GlobalAve, 2)
+```
+
+
+<h1 style="text-align:center">Organizational Health Dashboard*<br>vis-à-vis Global Companies</h1>
+<hr style="height:1px;border:none;color:#333;background-color:#333;">
+
+<br>
+
+<style>
+p.box {
+  position: center;
+  width: 650px;
+  height: 65px;
+  text-align: center;
+  line-height: 20px;
+  background-color: #fff;
+  border: 8px solid #666;
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+  -webkit-box-shadow: 2px 2px 4px #888;
+  -moz-box-shadow: 2px 2px 4px #888;
+  box-shadow: 2px 2px 4px #888;
+  margin:auto;
+}
+
+table.id {
+  font-size:18pt;
+}
+</style>
+<p class="box" style="font-size:12pt">This is a list of organizational health, as compared to other global companies.<br>Green is safe, orange is a warning and red is a problem.</p>
+
+<br><br>
+`r string <- "Not Available"`
+|Title  | Best Company to Work for:      | Best Manager to Work For:      | Turnover Intent                  |
+|-------|--------------------------------|--------------------------------|---------------------------------|
+|Company| `r q1_12CompAverage` / 5       |  `r q1_13CompAverage` / 5      | `r q1_15CompAverage` / 5        |
+|Team   | `r if (params$team == 0){string} else {q1_12TeamAverage}` / 5         |   `r if (params$team == 0){string} else {q1_13TeamAverage}` / 5       | `r if (params$team == 0){string} else {q1_12TeamAverage}` / 5          |
+|Global | `r q1_12GlobalAve` / 5         |   `r q1_13GlobalAve` / 5       | `r q1_15GlobalAve` / 5          |
+|Status |<svg height="50" width="50" align="center"><circle cx="25" cy="25" r="20" stroke="black" stroke-width="3" fill="`r q1_12answer`" /></svg>|<svg height="50" width="50" align="center"><circle cx="25" cy="25" r="20" stroke="black" stroke-width="3" fill="`r q1_13answer`" /></svg>|<svg height="50" width="50" align="center"><circle cx="25" cy="25" r="20" stroke="black" stroke-width="3" fill="`r q1_15answer`" /></svg>|
+<br><br>
+
+\*Using two-sample t-test assuming unequal variance
+<hr style="height:1px;border:none;color:#333;background-color:#333;">
+
+<h1 style="text-align:center">Company Rating</h1>
+<hr style="height:1px;border:none;color:#333;background-color:#333;">
+```{r, include=FALSE}
+#Global value of Company rating, manager rating, ... (first bar)
+
+
+###Q1.12
+q1_12Global <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.12" = quantumComp$Q1.12)
+
+q1_12Global$Q1.12 <- as.numeric(as.character(q1_12Global$Q1.12))
+q1_12Global <- q1_12Global[complete.cases(q1_12Global[ , 3]),]
+
+#Total num of Q1.12
+q1_12GlobalNum <- nrow(q1_12Global)
+#number of people who answered 5
+q1_12ExNum <- sum(na.omit(as.numeric(as.character(q1_12Global$Q1.12))) == 5)
+q1_12GoodNum <- sum(na.omit(as.numeric(as.character(q1_12Global$Q1.12))) == 4)
+q1_12FairNum <- sum(na.omit(as.numeric(as.character(q1_12Global$Q1.12))) == 3)
+q1_12NINum <- sum(na.omit(as.numeric(as.character(q1_12Global$Q1.12))) == 2)
+q1_12BadNum <- sum(na.omit(as.numeric(as.character(q1_12Global$Q1.12))) == 1)
+
+
+###Q1.13
+q1_13Global <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.13" = quantumComp$Q1.13)
+
+q1_13Global$Q1.13 <- as.numeric(as.character(q1_13Global$Q1.13))
+q1_13Global <- q1_13Global[complete.cases(q1_13Global[ , 3]),]
+
+#Total num of Q1.13
+q1_13GlobalNum <- nrow(q1_13Global)
+#number of people who answered 5
+q1_13ExNum <- sum(na.omit(as.numeric(as.character(q1_13Global$Q1.13))) == 5)
+q1_13GoodNum <- sum(na.omit(as.numeric(as.character(q1_13Global$Q1.13))) == 4)
+q1_13FairNum <- sum(na.omit(as.numeric(as.character(q1_13Global$Q1.13))) == 3)
+q1_13NINum <- sum(na.omit(as.numeric(as.character(q1_13Global$Q1.13))) == 2)
+q1_13BadNum <- sum(na.omit(as.numeric(as.character(q1_13Global$Q1.13))) == 1)
+
+
+###Q1.14
+q1_14Global <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.14" = quantumComp$Q1.14)
+
+q1_14Global$Q1.14 <- as.numeric(as.character(q1_14Global$Q1.14))
+q1_14Global <- q1_14Global[complete.cases(q1_14Global[ , 3]),]
+
+#Total num of Q1.14
+q1_14GlobalNum <- nrow(q1_14Global)
+#number of people who answered 5
+q1_14ExNum <- sum(na.omit(as.numeric(as.character(q1_14Global$Q1.14))) == 5)
+q1_14GoodNum <- sum(na.omit(as.numeric(as.character(q1_14Global$Q1.14))) == 4)
+q1_14FairNum <- sum(na.omit(as.numeric(as.character(q1_14Global$Q1.14))) == 3)
+q1_14NINum <- sum(na.omit(as.numeric(as.character(q1_14Global$Q1.14))) == 2)
+q1_14BadNum <- sum(na.omit(as.numeric(as.character(q1_14Global$Q1.14))) == 1)
+
+
+###Q1.15
+q1_15Global <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.15" = quantumComp$Q1.15)
+
+q1_15Global$Q1.15 <- as.numeric(as.character(q1_15Global$Q1.15))
+q1_15Global <- q1_15Global[complete.cases(q1_15Global[ , 3]),]
+
+#Total num of Q1.15
+q1_15GlobalNum <- nrow(q1_15Global)
+#number of people who answered 5
+q1_15ExNum <- sum(na.omit(as.numeric(as.character(q1_15Global$Q1.15))) == 5)
+q1_15GoodNum <- sum(na.omit(as.numeric(as.character(q1_15Global$Q1.15))) == 4)
+q1_15FairNum <- sum(na.omit(as.numeric(as.character(q1_15Global$Q1.15))) == 3)
+q1_15NINum <- sum(na.omit(as.numeric(as.character(q1_15Global$Q1.15))) == 2)
+q1_15BadNum <- sum(na.omit(as.numeric(as.character(q1_15Global$Q1.15))) == 1)
+
+
+###Q1.16
+q1_16Global <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.16" = quantumComp$Q1.16)
+
+q1_16Global$Q1.16 <- as.numeric(as.character(q1_16Global$Q1.16))
+q1_16Global <- q1_16Global[complete.cases(q1_16Global[ , 3]),]
+
+#Total num of Q1.16
+q1_16GlobalNum <- nrow(q1_16Global)
+#number of people who answered 5
+q1_16ExNum <- sum(na.omit(as.numeric(as.character(q1_16Global$Q1.16))) == 5)
+q1_16GoodNum <- sum(na.omit(as.numeric(as.character(q1_16Global$Q1.16))) == 4)
+q1_16FairNum <- sum(na.omit(as.numeric(as.character(q1_16Global$Q1.16))) == 3)
+q1_16NINum <- sum(na.omit(as.numeric(as.character(q1_16Global$Q1.16))) == 2)
+q1_16BadNum <- sum(na.omit(as.numeric(as.character(q1_16Global$Q1.16))) == 1)
+
+#Company Rating
+crGlobalExFinal <- round(q1_12ExNum / q1_12GlobalNum * 100,2)
+crGlobalGoodFinal <- round(q1_12GoodNum / q1_12GlobalNum * 100,2)
+crGlobalFairFinal <- round(q1_12FairNum / q1_12GlobalNum * 100,2)
+crGlobalNIFinal <- round(q1_12NINum / q1_12GlobalNum * 100,2)
+crGlobalBadFinal <- round(q1_12BadNum / q1_12GlobalNum * 100,2)
+
+#Manager Rating
+#mrGlobal....
+
+#Self Rating ...
+
+
+#Turnover Intent
+
+
+#Performance Evaluation
+
+```
+
+
+
+```{r, include=FALSE}
+##Global value of Company rating, manager rating, ... (second bar)
+###Q1.12
+q1_12Comp <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.12" = quantumComp$Q1.12)
+q1_12Comp$Q1.12 <- as.numeric(as.character(q1_12Comp$Q1.12))
+q1_12Comp <- q1_12Comp[complete.cases(q1_12Comp[ , 3]),]
+q1_12Comp <- subset(q1_12Comp, Q1.1.A == params$company)
+
+#Total num of Q1.12
+q1_12CompNum <- nrow(q1_12Comp)
+
+#number of people who answered 5
+q1_12CompExNum <- sum(na.omit(as.numeric(as.character(q1_12Comp$Q1.12))) == 5)
+q1_12CompGoodNum <- sum(na.omit(as.numeric(as.character(q1_12Comp$Q1.12))) == 4)
+q1_12CompFairNum <- sum(na.omit(as.numeric(as.character(q1_12Comp$Q1.12))) == 3)
+q1_12CompNINum <- sum(na.omit(as.numeric(as.character(q1_12Comp$Q1.12))) == 2)
+q1_12CompBadNum <- sum(na.omit(as.numeric(as.character(q1_12Comp$Q1.12))) == 1)
+
+
+###Q1.13
+q1_13Comp <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.13" = quantumComp$Q1.13)
+q1_13Comp$Q1.13 <- as.numeric(as.character(q1_13Comp$Q1.13))
+q1_13Comp <- q1_13Comp[complete.cases(q1_13Comp[ , 3]),]
+q1_13Comp <- subset(q1_13Comp, Q1.1.A == params$company)
+
+#Total num of Q1.13
+q1_13CompNum <- nrow(q1_13Comp)
+
+#number of people who answered 5
+q1_13CompExNum <- sum(na.omit(as.numeric(as.character(q1_13Comp$Q1.13))) == 5)
+q1_13CompGoodNum <- sum(na.omit(as.numeric(as.character(q1_13Comp$Q1.13))) == 4)
+q1_13CompFairNum <- sum(na.omit(as.numeric(as.character(q1_13Comp$Q1.13))) == 3)
+q1_13CompNINum <- sum(na.omit(as.numeric(as.character(q1_13Comp$Q1.13))) == 2)
+q1_13CompBadNum <- sum(na.omit(as.numeric(as.character(q1_13Comp$Q1.13))) == 1)
+
+
+###Q1.14
+q1_14Comp <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.14" = quantumComp$Q1.14)
+q1_14Comp$Q1.14 <- as.numeric(as.character(q1_14Comp$Q1.14))
+q1_14Comp <- q1_14Comp[complete.cases(q1_14Comp[ , 3]),]
+q1_14Comp <- subset(q1_14Comp, Q1.1.A == params$company)
+
+#Total num of Q1.14
+q1_14CompNum <- nrow(q1_14Comp)
+
+#number of people who answered 5
+q1_14CompExNum <- sum(na.omit(as.numeric(as.character(q1_14Comp$Q1.14))) == 5)
+q1_14CompGoodNum <- sum(na.omit(as.numeric(as.character(q1_14Comp$Q1.14))) == 4)
+q1_14CompFairNum <- sum(na.omit(as.numeric(as.character(q1_14Comp$Q1.14))) == 3)
+q1_14CompNINum <- sum(na.omit(as.numeric(as.character(q1_14Comp$Q1.14))) == 2)
+q1_14CompBadNum <- sum(na.omit(as.numeric(as.character(q1_14Comp$Q1.14))) == 1)
+
+
+###Q1.15
+q1_15Comp <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.15" = quantumComp$Q1.15)
+q1_15Comp$Q1.15 <- as.numeric(as.character(q1_15Comp$Q1.15))
+q1_15Comp <- q1_15Comp[complete.cases(q1_15Comp[ , 3]),]
+q1_15Comp <- subset(q1_15Comp, Q1.1.A == params$company)
+
+#Total num of Q1.15
+q1_15CompNum <- nrow(q1_15Comp)
+
+#number of people who answered 5
+q1_15CompExNum <- sum(na.omit(as.numeric(as.character(q1_15Comp$Q1.15))) == 5)
+q1_15CompGoodNum <- sum(na.omit(as.numeric(as.character(q1_15Comp$Q1.15))) == 4)
+q1_15CompFairNum <- sum(na.omit(as.numeric(as.character(q1_15Comp$Q1.15))) == 3)
+q1_15CompNINum <- sum(na.omit(as.numeric(as.character(q1_15Comp$Q1.15))) == 2)
+q1_15CompBadNum <- sum(na.omit(as.numeric(as.character(q1_15Comp$Q1.15))) == 1)
+
+###Q1.16
+q1_16Comp <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.16" = quantumComp$Q1.16)
+q1_16Comp$Q1.16 <- as.numeric(as.character(q1_16Comp$Q1.16))
+q1_16Comp <- q1_16Comp[complete.cases(q1_16Comp[ , 3]),]
+q1_16Comp <- subset(q1_16Comp, Q1.1.A == params$company)
+
+#Total num of Q1.16
+q1_16CompNum <- nrow(q1_16Comp)
+
+#number of people who answered 5
+q1_16CompExNum <- sum(na.omit(as.numeric(as.character(q1_16Comp$Q1.16))) == 5)
+q1_16CompGoodNum <- sum(na.omit(as.numeric(as.character(q1_16Comp$Q1.16))) == 4)
+q1_16CompFairNum <- sum(na.omit(as.numeric(as.character(q1_16Comp$Q1.16))) == 3)
+q1_16CompNINum <- sum(na.omit(as.numeric(as.character(q1_16Comp$Q1.16))) == 2)
+q1_16CompBadNum <- sum(na.omit(as.numeric(as.character(q1_16Comp$Q1.16))) == 1)
+
+
+
+#Company Rating
+crCompExFinal <- round(q1_12CompExNum / q1_12CompNum * 100,2)
+crCompGoodFinal <- round(q1_12CompGoodNum / q1_12CompNum * 100,2)
+crCompFairFinal <- round(q1_12CompFairNum / q1_12CompNum * 100,2)
+crCompNIFinal <- round(q1_12CompNINum / q1_12CompNum * 100,2)
+crCompBadFinal <- round(q1_12CompBadNum / q1_12CompNum * 100,2)
+
+#Manager Rating
+#mrComp....
+
+#Self Rating ...
+
+
+#Turnover Intent
+
+
+#Performance Evaluation
+```
+
+
+```{r, include=FALSE}
+##Global value of Company rating, manager rating, ... (second bar)
+
+if(params$team > 0) {
+###Q1.12
+q1_12Team <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.12" = quantumComp$Q1.12)
+q1_12Team$Q1.12 <- as.numeric(as.character(q1_12Team$Q1.12))
+q1_12Team <- q1_12Team[complete.cases(q1_12Team[ , 3]),]
+q1_12Team <- subset(q1_12Team, Q1.1.A == params$company)
+
+#Total num of Q1.12
+q1_12TeamNum <- nrow(q1_12Team)
+
+#number of people who answered 5
+q1_12TeamExNum <- sum(na.omit(as.numeric(as.character(q1_12Team$Q1.12))) == 5)
+q1_12TeamGoodNum <- sum(na.omit(as.numeric(as.character(q1_12Team$Q1.12))) == 4)
+q1_12TeamFairNum <- sum(na.omit(as.numeric(as.character(q1_12Team$Q1.12))) == 3)
+q1_12TeamNINum <- sum(na.omit(as.numeric(as.character(q1_12Team$Q1.12))) == 2)
+q1_12TeamBadNum <- sum(na.omit(as.numeric(as.character(q1_12Team$Q1.12))) == 1)
+
+
+###Q1.13
+q1_13Team <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.13" = quantumComp$Q1.13)
+q1_13Team$Q1.13 <- as.numeric(as.character(q1_13Team$Q1.13))
+q1_13Team <- q1_13Team[complete.cases(q1_13Team[ , 3]),]
+q1_13Team <- subset(q1_13Team, Q1.1.A == params$company)
+
+#Total num of Q1.13
+q1_13TeamNum <- nrow(q1_13Team)
+
+#number of people who answered 5
+q1_13TeamExNum <- sum(na.omit(as.numeric(as.character(q1_13Team$Q1.13))) == 5)
+q1_13TeamGoodNum <- sum(na.omit(as.numeric(as.character(q1_13Team$Q1.13))) == 4)
+q1_13TeamFairNum <- sum(na.omit(as.numeric(as.character(q1_13Team$Q1.13))) == 3)
+q1_13TeamNINum <- sum(na.omit(as.numeric(as.character(q1_13Team$Q1.13))) == 2)
+q1_13TeamBadNum <- sum(na.omit(as.numeric(as.character(q1_13Team$Q1.13))) == 1)
+
+
+###Q1.14
+q1_14Team <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.14" = quantumComp$Q1.14)
+q1_14Team$Q1.14 <- as.numeric(as.character(q1_14Team$Q1.14))
+q1_14Team <- q1_14Team[complete.cases(q1_14Team[ , 3]),]
+q1_14Team <- subset(q1_14Team, Q1.1.A == params$company)
+
+#Total num of Q1.14
+q1_14TeamNum <- nrow(q1_14Team)
+
+#number of people who answered 5
+q1_14TeamExNum <- sum(na.omit(as.numeric(as.character(q1_14Team$Q1.14))) == 5)
+q1_14TeamGoodNum <- sum(na.omit(as.numeric(as.character(q1_14Team$Q1.14))) == 4)
+q1_14TeamFairNum <- sum(na.omit(as.numeric(as.character(q1_14Team$Q1.14))) == 3)
+q1_14TeamNINum <- sum(na.omit(as.numeric(as.character(q1_14Team$Q1.14))) == 2)
+q1_14TeamBadNum <- sum(na.omit(as.numeric(as.character(q1_14Team$Q1.14))) == 1)
+
+
+###Q1.15
+q1_15Team <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.15" = quantumComp$Q1.15)
+q1_15Team$Q1.15 <- as.numeric(as.character(q1_15Team$Q1.15))
+q1_15Team <- q1_15Team[complete.cases(q1_15Team[ , 3]),]
+q1_15Team <- subset(q1_15Team, Q1.1.A == params$company)
+
+#Total num of Q1.15
+q1_15TeamNum <- nrow(q1_15Team)
+
+#number of people who answered 5
+q1_15TeamExNum <- sum(na.omit(as.numeric(as.character(q1_15Team$Q1.15))) == 5)
+q1_15TeamGoodNum <- sum(na.omit(as.numeric(as.character(q1_15Team$Q1.15))) == 4)
+q1_15TeamFairNum <- sum(na.omit(as.numeric(as.character(q1_15Team$Q1.15))) == 3)
+q1_15TeamNINum <- sum(na.omit(as.numeric(as.character(q1_15Team$Q1.15))) == 2)
+q1_15TeamBadNum <- sum(na.omit(as.numeric(as.character(q1_15Team$Q1.15))) == 1)
+
+###Q1.16
+q1_16Team <- data.frame("Q1.1.A" = quantumComp$Q1.1.A , "Q1.1.B" = quantumComp$Q1.1.B,  "Q1.16" = quantumComp$Q1.16)
+q1_16Team$Q1.16 <- as.numeric(as.character(q1_16Team$Q1.16))
+q1_16Team <- q1_16Team[complete.cases(q1_16Team[ , 3]),]
+q1_16Team <- subset(q1_16Team, Q1.1.A == params$company)
+
+#Total num of Q1.16
+q1_16TeamNum <- nrow(q1_16Team)
+
+#number of people who answered 5
+q1_16TeamExNum <- sum(na.omit(as.numeric(as.character(q1_16Team$Q1.16))) == 5)
+q1_16TeamGoodNum <- sum(na.omit(as.numeric(as.character(q1_16Team$Q1.16))) == 4)
+q1_16TeamFairNum <- sum(na.omit(as.numeric(as.character(q1_16Team$Q1.16))) == 3)
+q1_16TeamNINum <- sum(na.omit(as.numeric(as.character(q1_16Team$Q1.16))) == 2)
+q1_16TeamBadNum <- sum(na.omit(as.numeric(as.character(q1_16Team$Q1.16))) == 1)
+
+
+
+#Company Rating
+crTeamExFinal <- round(q1_12TeamExNum / q1_12TeamNum * 100,2)
+crTeamGoodFinal <- round(q1_12TeamGoodNum / q1_12TeamNum * 100,2)
+crTeamFairFinal <- round(q1_12TeamFairNum / q1_12TeamNum * 100,2)
+crTeamNIFinal <- round(q1_12TeamNINum / q1_12TeamNum * 100,2)
+crTeamBadFinal <- round(q1_12TeamBadNum / q1_12TeamNum * 100,2)
+
+#Manager Rating
+#mrTeam....
+
+#Self Rating ...
+
+
+#Turnover Intent
+
+
+#Performance Evaluation
+} else {
+  crTeamExFinal <- 0
+  crTeamGoodFinal <- 0
+  crTeamFairFinal <- 0
+  crTeamNIFinal <- 0
+  crTeamBadFinal <- 0
+  
+  #... <- 0
+}
+```
+
+
+```{r, include=TRUE, echo=FALSE}
+crBarPlotData <- data.frame("crGlobalExFinal" = crGlobalExFinal, "crGlobalGoodFinal" = crGlobalGoodFinal, "crGlobalFairFinal" = crGlobalFairFinal, "crGlobalNIFinal" = crGlobalNIFinal, "crGlobalBadFinal" = crGlobalBadFinal, "crCompExFinal" = crCompExFinal, "crCompGoodFinal" = crCompGoodFinal, "crCompFairFinal" = crCompFairFinal, "crCompNIFinal" = crCompNIFinal, "crCompBadFinal" = crCompBadFinal, "crTeamExFinal" = crTeamExFinal, "crTeamGoodFinal" = crTeamGoodFinal, "crTeamFairFinal" = crTeamFairFinal, "crTeamNIFinal" = crTeamNIFinal, "crTeamBadFinal" = crTeamBadFinal)
+
+barplot(rbind(`Overall`=c("Exc"=crGlobalExFinal,"Good"=crGlobalGoodFinal,"Fair"=crGlobalFairFinal,"NI"=crGlobalNIFinal, "Bad"= crGlobalBadFinal), `Company`=c("Exc"=crCompExFinal,"Good"=crCompGoodFinal,"Fair"=crCompFairFinal,"NI"=crCompNIFinal, "Bad"= crCompBadFinal), `Team`=c("Exc"=crTeamExFinal,"Good"=crTeamGoodFinal,"Fair"=crTeamFairFinal,"NI"=crTeamNIFinal, "Bad"= crTeamBadFinal)), col=c("blue","red","green"), beside=TRUE,horiz = TRUE,legend.text=TRUE)
+
+
+```
+
